@@ -1,31 +1,56 @@
-# 🛡️ AeroGuard: Distributed Critical Monitoring System
+# 🛡️ AeroGuard: Full-Stack Critical Monitoring & Anomaly Detection System
 
-> **Arquitectura distribuida tolerante a fallos para la monitorización de sistemas críticos en tiempo real.**
+> **Ecosistema distribuido de extremo a extremo para la monitorización industrial, coordinación de sensores por consenso y detección de anomalías mediante IA robusta.**
 
-![Architecture Diagram](Descripcion_Arquitectura.png) **
+![Architecture Diagram](Descripcion_Arquitectura.png)
 
-## 📋 Project Overview
-AeroGuard es una solución de ingeniería de software diseñada bajo principios de **Sistemas Críticos**. El sistema simula una red de sensores redundantes que operan bajo un modelo de **Consenso Distribuido** para garantizar la integridad de los datos incluso ante particiones de red o caídas de nodos (Crash Failures).
+## 📋 Resumen del Proyecto
 
-A diferencia de sistemas tradicionales, AeroGuard no tiene un punto único de fallo (SPOF) en su capa de recolección. Utiliza **Apache ZooKeeper** para la coordinación de clústeres y **algoritmos de elección de líder** para asegurar que siempre exista una fuente de verdad única reportando a la central de análisis.
+AeroGuard es una plataforma integral de **Software Crítico** que fusiona la coordinación distribuida de bajo nivel con el análisis avanzado de datos. El sistema está diseñado para operar en entornos SCADA/IoT donde la pérdida de un solo mensaje o una falsa alarma pueden tener consecuencias operativas graves.
 
-## 🚀 Key Features (Arquitectura & Diseño)
+La arquitectura se divide en dos grandes capas funcionales:
 
-### 🧠 Distributed Coordination (Control Plane)
-- **Leader Election:** Algoritmo dinámico donde los nodos eligen un coordinador automáticamente. Si el líder cae, el sistema se recupera en milisegundos (Failover automático).
-- **Service Discovery:** Registro efímero de nodos activos mediante ZNodes.
-- **Hot-Reconfiguration:** Capacidad de actualizar parámetros críticos (frecuencia de muestreo, endpoints) en tiempo real sin detener el servicio, usando *Data Watchers*.
+1. **Distributed Edge Cluster (ZooKeeper Control Plane):** Una red de sensores inteligentes coordinados por un ensamble de ZooKeeper para garantizar alta disponibilidad, sincronización y resiliencia ante fallos de nodos.
+2. **Analysis Sentinel (AI & Persistence Layer):** Una infraestructura híbrida (Sentinel/Cluster) que ingesta los datos agregados y utiliza un motor de inteligencia artificial basado en la diversidad de diseño para la detección de anomalías.
 
-### 📡 Data Aggregation (Data Plane)
-- **Distributed Queues:** Implementación del patrón Productor-Consumidor distribuido. Todos los nodos miden (Redundancia), pero solo el líder agrega y transmite.
-- **Sensor Fusion Strategy:** Cálculo de medias agregadas para mitigación de ruido en sensores individuales.
+---
 
-### 🛡️ Analysis & Persistence (Legacy Integration)
-- **Anomaly Detection:** API REST dedicada que ingesta los datos agregados y detecta desviaciones críticas en tiempo real.
-- **Resilient Storage:** Capa de persistencia basada en Redis para el histórico de métricas.
+## 🏗️ Arquitectura del Sistema
 
-## 🛠️ Tech Stack
-- **Lenguaje:** Python 3.10+ (Kazoo, Requests, Flask).
-- **Orquestación:** Docker & Docker Compose (Simulación de Cluster).
-- **Coordinación:** Apache ZooKeeper (Ensemble de 3 nodos).
-- **Persistencia:** Redis.
+### 📡 1. Capa de Sensores Distribuidos (Edge Computing)
+
+Utiliza **Apache ZooKeeper** como orquestador para eliminar cualquier punto único de fallo (SPOF) y gestionar el estado del clúster.
+
+* **Elección de Líder (Fault-Tolerance):** Mediante la receta `Election` de Kazoo, los sensores eligen dinámicamente un coordinador. Si el líder falla, el sistema realiza un failover automático detectando la expiración del **Znode efímero**, permitiendo que otro nodo asuma el mando sin interrupción.
+* **Sincronización y Agregación (Opción B):** Implementa un patrón de disparo secuencial. El líder genera un trigger en `/sequence_trigger` y los seguidores, al detectar el cambio mediante un *Watcher*, depositan sus mediciones en una **cola distribuida** para un procesamiento ordenado.
+* **Configuración Distribuida en Caliente:** Uso de `DataWatch` para actualizar parámetros críticos (períodos de muestreo y URLs de API) en tiempo real en todo el clúster sin necesidad de reinicios.
+
+### 🧠 2. Sentinel: Detección de Anomalías e IA Robusta
+
+Para garantizar la fiabilidad de las alertas, el sistema aplica la técnica de **Diversidad de Diseño** (Ensemble Prediction).
+
+* **Modelos Ortogonales:** El sistema evalúa los datos mediante cuatro modelos disjuntos: una Regla Física (determinista), Isolation Forest (estadístico), Autoencoder (reconstrucción) y LSTM (secuencial).
+* **Voto por Consenso M-of-N:** Se requiere un quórum de al menos **3 de los 4 modelos** para declarar una anomalía como crítica. Esta estrategia de "Ensemble" reduce drásticamente los falsos positivos causados por el ruido del sensor o alucinaciones de modelos individuales.
+
+### 🗄️ 3. Capa de Datos
+
+La persistencia se gestiona mediante una Arquitectura que permite cumplir el comportamiento del sistema según el Teorema CAP:
+
+* **Modo CP (Redis Sentinel):** Prioriza la **Consistencia Estricta** e integridad del dato, garantizando un único punto de escritura activo para mantener la ordenación total de las series temporales.
+
+---
+
+## 🚀 Despliegue e Infraestructura
+
+### Stack Tecnológico
+
+* **Coordinación:** Apache ZooKeeper (Clúster de 3 nodos para garantizar quórum).
+* **Persistencia:** Redis Stack Server con soporte para `RedisTimeSeries`.
+* **IA & Backend:** Python 3.10+, Kazoo, TensorFlow, Scikit-learn, FastAPI.
+* **Observabilidad:** Grafana para el análisis forense y trazabilidad de las decisiones de la IA.
+
+### Instrucciones de Ejecución
+
+1. **Levantar el Clúster:** Despliegue del stack completo (Zookeeper Ensemble + Sensores + Sentinel API + Redis).
+   ```bash
+   docker-compose up -d --build
