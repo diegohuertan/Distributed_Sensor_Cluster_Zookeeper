@@ -110,15 +110,16 @@ services:
   # ZONA 3: PERSISTENCIA Y DETECCIÓN (REDIS HA + API - PRÁCTICA 2)
   # ==============================================================================
   
-  # --- API LEGACY (Renombrada de 'web' a 'legacy-api') ---
+  # --- API LEGACY (Ajustada a tu estructura de carpetas) ---
   legacy-api:
     build: 
-      context: ./components/legacy_api # <--- Ruta actualizada a la nueva estructura
-      dockerfile: Dockerfile
+      context: ./components/legacy_api  # La raíz del componente
+      dockerfile: app/Dockerfile        # <--- ¡LA CORRECCIÓN CLAVE!
     container_name: legacy-api
     ports:
       - "8000:8000"
     environment:
+      # Pasamos las variables para que tu código use Sentinel
       - REDIS_SENTINEL_HOST=sentinel-1
       - REDIS_SENTINEL_PORT=26379
       - REDIS_MASTER_SET=mymaster
@@ -128,7 +129,7 @@ services:
       - sentinel-2
       - sentinel-3
     networks:
-      - zk-network # Unificada
+      - zk-network
 
   # --- REDIS MASTER (TimeSeries Activado) ---
   redis-master:
