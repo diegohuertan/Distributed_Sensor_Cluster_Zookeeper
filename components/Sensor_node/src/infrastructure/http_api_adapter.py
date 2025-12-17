@@ -1,5 +1,6 @@
 import logging
 import requests
+import time
 from requests.exceptions import RequestException
 
 from ..domain.ports import IHttpApiAdapter
@@ -25,31 +26,35 @@ class HttpApiAdapter(IHttpApiAdapter):
     def send_average(self, average: float) -> bool:
         """
         Envía el valor promedio de las mediciones a la API configurada.
-
-        Args:
-            average: El valor flotante de la media calculada.
-
-        Returns:
-            True si la API devuelve un código 2xx, False en cualquier otro caso.
         """
-        # El payload esperado por la API de la Práctica 2
-        payload = {"valor_medio": average}
+        # --- CORRECCIÓN AQUÍ ---
+        # El payload DEBE coincidir con el modelo Pydantic de tu API:
+        # sensor_id (str), valor (float), timestamp (opcional)
+        payload = {
+            "sensor_id": "CLUSTER_AGGREGATE", # Identificador para diferenciar que es una media del clúster
+            "valor": average,                 # La clave exacta que pide tu Pydantic
+            "timestamp": time.time()          # Opcional, pero recomendado
+        }
+        
         logging.info(f"Enviando media {average:.2f} a la API en {self.api_url}")
 
         try:
-            # Es CRÍTICO definir un timeout para evitar bloqueos indefinidos.
+            # Timeout crítico de 5s
             response = self.session.post(self.api_url, json=payload, timeout=5.0)
             
-            # Lanza una excepción HTTPError para respuestas 4xx/5xx.
+            # Si la API devuelve 422 (Validation Error), esto nos lo dirá en el log
+            if response.status_code == 422:
+                logging.error(f"❌ Error de Validación de Datos (422): {response.text}")
+                return False
+
             response.raise_for_status()
             
             logging.info(f"Media enviada correctamente. Respuesta de la API: {response.status_code}")
             return True
+            
         except RequestException as e:
-            # Captura errores de conexión, timeouts, DNS, etc.
             logging.error(f"Error de red al contactar la API: {e}")
             return False
         except Exception as e:
-            # Captura cualquier otro error inesperado.
             logging.error(f"Error inesperado al enviar datos a la API: {e}")
             return False
