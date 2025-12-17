@@ -3,7 +3,7 @@ import requests
 import time
 from requests.exceptions import RequestException
 
-from ..domain.ports import IHttpApiAdapter
+from src.domain.ports import IHttpApiAdapter
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

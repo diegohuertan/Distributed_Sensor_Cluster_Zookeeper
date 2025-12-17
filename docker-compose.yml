@@ -75,7 +75,7 @@ services:
     command: ["1"]
     environment:
       - ZOO_HOSTS=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
-      - API_URL=http://legacy-api:8000/mediciones
+      - API_URL=http://legacy-api:8000/api/v1/nuevo
     networks:
       - zk-network
 
@@ -89,7 +89,7 @@ services:
     command: ["2"]
     environment:
       - ZOO_HOSTS=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
-      - API_URL=http://legacy-api:8000/mediciones
+      - API_URL=http://legacy-api:8000/api/v1/nuevo
     networks:
       - zk-network
 
@@ -103,7 +103,7 @@ services:
     command: ["3"]
     environment:
       - ZOO_HOSTS=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
-      - API_URL=http://legacy-api:8000/mediciones
+      - API_URL=http://legacy-api:8000/api/v1/nuevo
     networks:
       - zk-network
 
@@ -214,7 +214,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - GF_INSTALL_PLUGINS=redis-datasource
     networks:

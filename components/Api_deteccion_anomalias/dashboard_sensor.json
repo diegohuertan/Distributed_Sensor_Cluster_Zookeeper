@@ -18,13 +18,12 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": null,
   "links": [],
   "panels": [
     {
       "datasource": {
-        "type": "redis-datasource",
-        "uid": "cf57jjlm04p34c"
+        "type": "redis-datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -35,21 +34,20 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "Valor Promedio",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 10,
+            "gradientMode": "area",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -62,7 +60,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "area"
             }
           },
           "mappings": [],
@@ -71,69 +69,66 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "red",
-                "value": 100
+                "value": 110
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 10,
+        "w": 24,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": ["mean", "lastNotNull", "max"],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
       "targets": [
         {
           "command": "ts.range",
           "datasource": {
-            "type": "redis-datasource",
-            "uid": "cf57jjlm04p34c"
+            "type": "redis-datasource"
           },
-          "keyName": "sensor:sensor_dashboard:ts",
-          "legend": "Histórico de Temperatura (Sensor Dashboard)",
+          "keyName": "CLUSTER_AGGREGATE",
+          "legend": "Media de Sensores (ZooKeeper Cluster)",
           "query": "",
           "refId": "A",
           "type": "timeSeries"
         }
       ],
-      "title": "New panel",
+      "title": "AeroGuard: Monitorización de Media Agregada",
       "type": "timeseries"
     }
   ],
-  "preload": false,
   "schemaVersion": 42,
-  "tags": [],
+  "tags": ["AeroGuard", "P3", "Zookeeper"],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "DashboardVistaSensor",
-  "uid": "ad5hlkl",
-  "version": 3
+  "title": "AeroGuard System Dashboard",
+  "uid": "aeroguard-p3",
+  "version": 1
 }
