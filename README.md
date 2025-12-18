@@ -53,8 +53,8 @@ La persistencia se gestiona mediante una Arquitectura que permite cumplir el com
 
 ### tiene a libre disposicion los pdfs de las investigaciones que conforman este proyecto
 
-1. **Investigación Sentinel [Paper Setinel](PaperCientificoSentinel.pdf)
-2. **Investigación Zookeeper [Paper Zookeeper](.PaperCientificoZookeeper.pdf)
+1. Investigación Sentinel [Paper Setinel](PaperCientificoSentinel.pdf)
+2. Investigación Zookeeper [Paper Zookeeper](PaperCientificoZookeeper.pdf)
 
 
 
